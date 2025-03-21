@@ -1,0 +1,62 @@
+															TASK - 02 
+1. Find the Total Number of Orders for Each Customer
+   SELECT customer_id, COUNT(order_id) AS total_orders
+   FROM Orders
+   GROUP BY customer_id;
+
+2. Find the Total Sales Amount for Each Product (Revenue per Product)
+   SELECT P.product_id, P.product_name, SUM(OD.quantity * OD.unit_price) AS total_sales
+   FROM OrderDetails OD
+   JOIN Products P ON OD.product_id = P.product_id
+   GROUP BY P.product_id, P.product_name;
+   
+3. Find the Most Expensive Product Sold
+   SELECT P.product_id, P.product_name, MAX(OD.unit_price) AS most_expensive_price
+   FROM OrderDetails OD
+   JOIN Products P ON OD.product_id = P.product_id
+   GROUP BY P.product_id, P.product_name
+   ORDER BY most_expensive_price DESC
+   
+4. Get the List of Customers Who Have Placed Orders in the Last 30 Days
+   SELECT DISTINCT C.customer_id, C.first_name, C.last_name, C.email
+   FROM Customers C
+   JOIN Orders O ON C.customer_id = O.customer_id
+   WHERE O.order_date >= CURDATE() - INTERVAL 30 DAY;
+   
+5. Calculate the Total Amount Paid by Each Customer
+   SELECT C.customer_id, C.first_name, C.last_name, SUM(P.payment_amount) AS total_paid
+   FROM Payments P
+   JOIN Orders O ON P.order_id = O.order_id
+   JOIN Customers C ON O.customer_id = C.customer_id
+   GROUP BY C.customer_id;
+   
+6. Get the Number of Products Sold by Category
+   SELECT P.category, SUM(OD.quantity) AS total_products_sold
+   FROM OrderDetails OD
+   JOIN Products P ON OD.product_id = P.product_id
+   GROUP BY P.category;
+   
+7. List All Orders That Are Pending (i.e., Orders that haven't been shipped yet)
+   SELECT O.order_id, O.order_date, O.total_amount, O.order_status
+   FROM Orders O
+   WHERE O.order_status = 'Pending';
+
+8. Find the Average Order Value (Total Order Amount / Number of Orders)
+   SELECT AVG(total_amount) AS average_order_value
+   FROM Orders;
+   
+9. List the Top 5 Customers Who Have Spent the Most Money
+   SELECT C.customer_id, C.first_name, C.last_name, SUM(P.payment_amount) AS total_spent
+   FROM Payments P
+   JOIN Orders O ON P.order_id = O.order_id
+   JOIN Customers C ON O.customer_id = C.customer_id
+   GROUP BY C.customer_id
+   ORDER BY total_spent DESC
+   LIMIT 5;
+   
+10. Find the Products That Have Never Been Sold
+    SELECT P.product_id, P.product_name
+    FROM Products P
+    LEFT JOIN OrderDetails OD ON P.product_id = OD.product_id
+    WHERE OD.order_detail_id IS NULL;
+

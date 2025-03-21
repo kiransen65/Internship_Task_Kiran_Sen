@@ -1,0 +1,24 @@
+																			TASK - 01
+1.Retrieve the names and contact details of all drivers with a rating of 4.5 or higher.
+    SELECT FirstName, LastName, Phone, Rating From Drivers
+	WHERE Rating >= 4.5;
+
+2.Find the total number of rides completed by each driver.
+   SELECT DriverID, COUNT(RideID) AS TotalRides
+   FROM Rides
+   WHERE RideStatus = 'Completed'
+   GROUP BY DriverID;
+   
+3. List all riders who have never booked a ride.
+   SELECT RiderID, FirstName, LastName FROM Riders WHERE 
+   RiderID NOT IN;
+
+4. Calculate the total earning of each driver from completed rides.
+   SELECT d.DriverID, d.FirstName, d.LastName FROM Drivers details
+   JOIN Riders r ON d.DriverID = r.DriverID 
+   JOIN Payment p ON r.RideID = p.RideID 
+   WHERE r.RideStatus = 'Completed'
+   GROUP BY d.DriverID, d.FirstName, d.LastName; 
+
+5.Retrive the most recent ride for each rider.
+   
