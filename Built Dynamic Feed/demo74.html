@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Feed with Pagination</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #articleForm {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            margin-bottom: 10px;
+        }
+
+        #newsFeed {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .article {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            width: calc(50% - 10px);
+        }
+
+        .article img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        #paginationControls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .page-link {
+            margin: 0 5px;
+        }
+
+        .active-page {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Dynamic News Feed</h1>
+
+        <form id="articleForm" class="form-inline">
+            <input type="text" id="title" class="form-control" placeholder="Title" required>
+            <textarea id="description" class="form-control" placeholder="Description" required></textarea>
+            <input type="url" id="imageURL" class="form-control" placeholder="Image URL (Optional)">
+            <button type="submit" class="btn btn-primary">Add Article</button>
+        </form>
+
+        <div id="newsFeed"></div>
+
+        <div id="paginationControls">
+            <button id="prevPage" class="btn btn-default">Previous</button>
+            <span id="paginationNumbers"></span>
+            <button id="nextPage" class="btn btn-default">Next</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+<script>
+const articles = [];
+const articlesPerPage = 4;
+let currentPage = 1;
+
+const articleForm = document.getElementById('articleForm');
+const newsFeed = document.getElementById('newsFeed');
+const paginationNumbers = document.getElementById('paginationNumbers');
+const prevPage = document.getElementById('prevPage');
+const nextPage = document.getElementById('nextPage');
+
+articleForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const imageURL = document.getElementById('imageURL').value.trim();
+
+    if (title && description) {
+        articles.push({ title, description, imageURL });
+        articleForm.reset();
+        renderArticles();
+        renderPagination();
+    } else {
+        alert('Title and Description are required!');
+    }
+});
+
+function renderArticles() {
+    newsFeed.innerHTML = '';
+    const start = (currentPage - 1) * articlesPerPage;
+    const end = start + articlesPerPage;
+    const articlesToDisplay = articles.slice(start, end);
+
+    if (articlesToDisplay.length === 0) {
+        newsFeed.innerHTML = '<p class="text-center">No articles to display. Add some articles to get started!</p>';
+        return;
+    }
+
+    articlesToDisplay.forEach((article) => {
+        const articleElement = document.createElement('div');
+        articleElement.className = 'article';
+        articleElement.innerHTML = `
+            <h3>${article.title}</h3>
+            <p>${article.description}</p>
+            ${article.imageURL ? `<img src="${article.imageURL}" alt="Article Image" class="img-responsive">` : ''}
+        `;
+        newsFeed.appendChild(articleElement);
+    });
+}
+
+function renderPagination() {
+    paginationNumbers.innerHTML = '';
+    const totalPages = Math.ceil(articles.length / articlesPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        pageButton.className = i === currentPage ? 'btn btn-primary page-link active-page' : 'btn btn-default page-link';
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            renderArticles();
+            renderPagination();
+        });
+        paginationNumbers.appendChild(pageButton);
+    }
+
+    prevPage.disabled = currentPage === 1;
+    nextPage.disabled = currentPage === totalPages;
+}
+
+prevPage.addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderArticles();
+        renderPagination();
+    }
+});
+
+nextPage.addEventListener('click', () => {
+    if (currentPage < Math.ceil(articles.length / articlesPerPage)) {
+        currentPage++;
+        renderArticles();
+        renderPagination();
+    }
+});
+</script>
+</html>

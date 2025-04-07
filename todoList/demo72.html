@@ -1,0 +1,152 @@
+ 
+                
+
+
+
+     <!DOCTYPE html>
+<html>
+<head>
+    <title>TODO List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body style="background: pink" onload="init()">
+    <div class="container">
+        <h1 style="text-align:center; text-shadow:2px 2px 5px white; color:red;">Todo-List</h1>
+        <div class="row">
+            <!-- Add a task section -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h1 style="text-align:left; color:rgb(7, 4, 4);">Add a task</h1>
+                    <input type="text" placeholder="Task" id="taskInput" class="form-control" />
+                    <br/>
+                    <span id="errorMsg" style="color:red;"></span>
+                </div>
+            </div>
+            <!-- Search for a task section -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h1 style="text-align:left; color:rgb(7, 4, 4);">Search for a task</h1>
+                    <input type="text" placeholder="Search" id="searchInput" class="form-control" oninput="searchTask()" />
+                    <br/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Buttons -->
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input type="button" value="Add a task" onclick="addTask()" class="form-control btn btn-primary" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input type="button" value="Clear all" onclick="clearAllTasks()" class="form-control btn btn-danger" />
+                </div>
+            </div>
+        </div>
+        <!-- Task list -->
+        <ul id="taskList" class="list-group"></ul>
+    </div>
+
+    <script>
+        let tasks = [];
+
+        // Initialize the app
+        function init() {
+            const savedTasks = localStorage.getItem("tasks");
+            tasks = savedTasks ? JSON.parse(savedTasks) : [];
+            displayTasks();
+        }
+
+        // Add a new task
+        function addTask() {
+            const taskInput = document.getElementById("taskInput");
+            const taskName = taskInput.value.trim();
+            const errorMsg = document.getElementById("errorMsg");
+
+            if (!taskName) {
+                errorMsg.textContent = "Task cannot be empty!";
+                return;
+            }
+
+            tasks.push(taskName);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            taskInput.value = "";
+            errorMsg.textContent = "";
+            displayTasks();
+        }
+
+        // Display all tasks
+        function displayTasks() {
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = "";
+
+            tasks.forEach((task, index) => {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+                listItem.textContent = task;
+
+                // Edit button
+                const editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.className = "btn btn-warning btn-sm";
+                editButton.style.marginLeft = "10px";
+                editButton.onclick = () => editTask(index);
+                listItem.appendChild(editButton);
+
+                // Delete button
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.className = "btn btn-danger btn-sm";
+                deleteButton.style.marginLeft = "5px";
+                deleteButton.onclick = () => deleteTask(index);
+                listItem.appendChild(deleteButton);
+
+                taskList.appendChild(listItem);
+            });
+        }
+
+        // Edit an existing task
+        function editTask(index) {
+            const newTask = prompt("Edit your task:", tasks[index]);
+            if (newTask !== null && newTask.trim() !== "") {
+                tasks[index] = newTask.trim();
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+                displayTasks();
+            }
+        }
+
+        // Delete a task
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            displayTasks();
+        }
+
+        // Clear all tasks
+        function clearAllTasks() {
+            tasks = [];
+            localStorage.removeItem("tasks");
+            displayTasks();
+        }
+
+        // Search for a task
+        function searchTask() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const taskList = document.getElementById("taskList");
+            const listItems = taskList.getElementsByTagName("li");
+
+            for (let i = 0; i < listItems.length; i++) {
+                const taskText = listItems[i].firstChild.textContent.toLowerCase();
+                if (taskText.includes(searchInput)) {
+                    listItems[i].style.backgroundColor = "yellow"; // Highlight matched tasks
+                } else {
+                    listItems[i].style.backgroundColor = ""; // Remove highlight
+                }
+            }
+        }
+    </script>
+</body>
+</html>
